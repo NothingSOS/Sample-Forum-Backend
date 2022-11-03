@@ -4,7 +4,8 @@ Test Forum Backend is a sample backend project using Express.js + Prisma + MySQL
 to create API for a forum-like project.
 
 ## Installation
-1. Create .env file at the root of project using .env.example as a template.
+At the root of the project
+1. Create new .env file using .env.example as a template.
 2. Run "docker-compose up" to create and run a local MySQL DB container.
 3. Run "npm i" to install node modules for the project.
 4. Run "npm run prisma:push && npm run prisma:seed" to setup tables and seed data for DB
