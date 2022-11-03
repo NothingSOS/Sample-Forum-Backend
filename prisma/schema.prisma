@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model PreUser {
+  id        Int    @id @default(autoincrement())
+  email     String @unique @db.VarChar(255)
+  randomKey String @db.VarChar(128)
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  displayName String       @unique @db.VarChar(255)
+  email       String       @unique @db.VarChar(255)
+  password    String       @db.VarChar(255)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  ForumPost   ForumPost[]
+  ForumReply  ForumReply[]
+}
+
+model ForumCategory {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique @db.VarChar(40)
+  description String      @unique @db.VarChar(255)
+  status      Boolean     @db.TinyInt
+  ForumPost   ForumPost[]
+}
+
+model ForumPost {
+  id              Int           @id @default(autoincrement())
+  author          User          @relation(fields: [authorId], references: [id])
+  authorId        Int
+  forumCategory   ForumCategory @relation(fields: [forumCategoryId], references: [id])
+  forumCategoryId Int
+  title           String        @db.Text
+  detail          String        @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  ForumReply      ForumReply[]
+}
+
+model ForumReply {
+  id          Int       @id @default(autoincrement())
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    Int
+  forumPost   ForumPost @relation(fields: [forumPostId], references: [id])
+  forumPostId Int
+  detail      String    @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
