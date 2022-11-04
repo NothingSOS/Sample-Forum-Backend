@@ -5,7 +5,7 @@ import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as randomstring from "randomstring";
 
-import { PreUserJWT, RequestBodyLogin, RequestBodyRegister, RequestBodyVerifyEmail, RequestBodyVerifyUser } from "../@types/auth";
+import { PreUserJWT, RequestBodyLogin, RequestBodyRegister, RequestBodyVerifyEmail, RequestBodyVerifyUser } from "./auth.d";
 import { transportOption } from "../config/nodemailer.config";
 
 const prisma = new PrismaClient();
@@ -49,9 +49,7 @@ const authController = {
       const atk = jwt.sign({ userId: user.id }, process.env.JWT_SECRET ?? "secret", { expiresIn: process.env.JWT_EXPIRE ?? "3600s" });
       res.status(200).send({ atk });
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        console.log(e.message);
-      }
+      if (e instanceof Prisma.PrismaClientKnownRequestError || e instanceof Prisma.PrismaClientInitializationError) console.log(e.message);
 
       return res.status(500).send();
     }
@@ -97,9 +95,7 @@ const authController = {
         res.status(200).send("Register success!");
       });
     } catch (e) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        console.log(e.message);
-      }
+      if (e instanceof Prisma.PrismaClientKnownRequestError || e instanceof Prisma.PrismaClientInitializationError) console.log(e.message);
 
       return res.status(500).send();
     }
@@ -142,7 +138,7 @@ const authController = {
 
         return res.status(200).send();
       } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) console.log(e.message);
+        if (e instanceof Prisma.PrismaClientKnownRequestError || e instanceof Prisma.PrismaClientInitializationError) console.log(e.message);
 
         return res.status(500).send();
       }
