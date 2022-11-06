@@ -1,6 +1,6 @@
-# Test Forum Backend
+# Sample Forum Backend
 
-Test Forum Backend is a sample backend project using Express.js + Prisma + MySQL (Docker Compose)
+Sample Forum Backend is a sample backend project using Express.js + Prisma + MySQL (Docker Compose)
 to create API for a forum-like project.
 
 ## Installation
