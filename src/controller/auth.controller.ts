@@ -5,7 +5,7 @@ import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as randomstring from "randomstring";
 
-import { PreUserJWT, RequestBodyLogin, RequestBodyRegister, RequestBodyVerifyEmail, RequestBodyVerifyUser } from "./auth.d";
+import { PreUserJWT, RequestBodyLogin, RequestBodyRegister, RequestBodyVerifyEmail, RequestBodyVerifyUser } from "./auth.type";
 import { transportOption } from "../config/nodemailer.config";
 
 const prisma = new PrismaClient();
