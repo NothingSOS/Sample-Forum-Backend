@@ -1,11 +1,15 @@
 import express from "express";
-import authController from "../controller/auth.controller";
+
+import validateRequest from "../middlewares/validateRequest";
+import authController from "../controllers/auth.controller";
+
+import { RequestBodyLogin, RequestBodyRegister, RequestBodyVerifyEmail, RequestBodyVerifyUser } from "../@types/auth.type";
 
 const router = express.Router();
 
-router.post("/login", authController.login);
-router.post("/register", authController.register);
-router.post("/verify-email", authController.verifyEmail);
-router.post("/verify-user", authController.verifyUser);
+router.post("/login", [validateRequest("body", RequestBodyLogin)], authController.login);
+router.post("/register", [validateRequest("body", RequestBodyRegister)], authController.register);
+router.post("/verify-email", [validateRequest("body", RequestBodyVerifyEmail)], authController.verifyEmail);
+router.post("/verify-user", [validateRequest("body", RequestBodyVerifyUser)], authController.verifyUser);
 
 export default router;

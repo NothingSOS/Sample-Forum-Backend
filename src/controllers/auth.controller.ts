@@ -5,12 +5,12 @@ import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import * as nodemailer from "nodemailer";
 import * as randomstring from "randomstring";
 
-import { PreUserJWT, RequestBodyLogin, RequestBodyRegister, RequestBodyVerifyEmail, RequestBodyVerifyUser } from "./auth.type";
-import { transportOption } from "../config/nodemailer.config";
+import { TypePreUserJWT, TypeRequestBodyLogin, TypeRequestBodyRegister, TypeRequestBodyVerifyEmail, TypeRequestBodyVerifyUser } from "../@types/auth.type";
+import { transportOption } from "../configs/nodemailer.config";
 
 const prisma = new PrismaClient();
 
-const checkPreUser = async (key: string): Promise<[200, PreUserJWT] | [400 | 500, string]> => {
+const checkPreUser = async (key: string): Promise<[200, TypePreUserJWT] | [400 | 500, string]> => {
   try {
     let info = jwt.verify(key, process.env.JWT_SECRET ?? "");
     if (!info || typeof info === "string" || info instanceof String) return [400, `JsonWebTokenError : Invalid payload`];
@@ -34,17 +34,15 @@ const checkPreUser = async (key: string): Promise<[200, PreUserJWT] | [400 | 500
 };
 
 const authController = {
-  async login(req: Request<{}, {}, RequestBodyLogin>, res: Response) {
+  async login(req: Request<{}, {}, TypeRequestBodyLogin>, res: Response) {
     const { email, password } = req.body;
-    if (!email || !password) res.status(400);
-    email.trim();
 
     try {
       const user = await prisma.user.findFirst({ where: { email } });
-      if (!user) return res.status(404).send("E-mail and/or password is incorrect");
+      if (!user) return res.status(401).send("E-mail and/or password is incorrect");
 
       const isUser = bcrypt.compareSync(password, user.password);
-      if (!isUser) return res.status(404).send("E-mail and/or password is incorrect");
+      if (!isUser) return res.status(401).send("E-mail and/or password is incorrect");
 
       const atk = jwt.sign({ userId: user.id }, process.env.JWT_SECRET ?? "secret", { expiresIn: process.env.JWT_EXPIRE ?? "3600s" });
       res.status(200).send({ atk });
@@ -55,10 +53,8 @@ const authController = {
     }
   },
 
-  async register(req: Request<{}, {}, RequestBodyRegister>, res: Response) {
+  async register(req: Request<{}, {}, TypeRequestBodyRegister>, res: Response) {
     const { email } = req.body;
-    if (!email) return res.status(400).send();
-    email.trim();
 
     try {
       const dupUser = await prisma.user.findFirst({ where: { email } });
@@ -101,9 +97,8 @@ const authController = {
     }
   },
 
-  async verifyEmail(req: Request<{}, {}, RequestBodyVerifyEmail>, res: Response) {
+  async verifyEmail(req: Request<{}, {}, TypeRequestBodyVerifyEmail>, res: Response) {
     const { key } = req.body;
-    if (!key) return res.status(400).send();
 
     const checkPreUserResult = await checkPreUser(key);
     let resMessage = "Success";
@@ -113,9 +108,8 @@ const authController = {
     return res.status(checkPreUserResult[0]).send(resMessage);
   },
 
-  async verifyUser(req: Request<{}, {}, RequestBodyVerifyUser>, res: Response) {
+  async verifyUser(req: Request<{}, {}, TypeRequestBodyVerifyUser>, res: Response) {
     const { key, displayName, password } = req.body;
-    if (!key || !displayName || !password) return res.status(400).send();
 
     const checkPreUserResult = await checkPreUser(key);
     if (checkPreUserResult[0] === 400) return res.status(checkPreUserResult[0]).send(checkPreUserResult[1]);
@@ -136,7 +130,7 @@ const authController = {
         const deletePreUser = prisma.preUser.delete({ where: { id: checkPreUserResult[1].id } });
         await prisma.$transaction([createNewUser, deletePreUser]);
 
-        return res.status(200).send();
+        res.status(200).send();
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError || e instanceof Prisma.PrismaClientInitializationError) console.log(e.message);
 

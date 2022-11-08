@@ -27,7 +27,8 @@
     "mysql2": "^2.3.3",
     "nodemailer": "^6.8.0",
     "randomstring": "^1.2.3",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
